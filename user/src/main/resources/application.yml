@@ -1,0 +1,135 @@
+# Using profiles for properties that change by environment
+#
+#"%dev":
+#  quarkus:
+#    http:
+#      port: 8083
+#      
+#  datasource:
+#    jdbc:
+#      url: jdbc:postgresql://localhost:5432/apimsadb
+
+quarkus:
+  # Enable to apply CORS filter
+  http:
+    cors: 
+      ~: true
+      #using a null key (normally represented by ~) for any YAML property which is a prefix of another one
+      methods: GET,PUT,POST
+    port: 8083
+
+  # Datasource configuration
+  datasource:
+    db-kind: postgresql
+    username: postgres
+    password: postgres
+    jdbc:
+      driver: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432/apimsadb
+      initial-size: 1
+      min-size: 2
+      max-size: 8
+
+  # Hibernate ORM configuration
+  hibernate-orm:
+    dialect: org.hibernate.dialect.PostgreSQL95Dialect
+    database:
+      generation: update
+   # generation: drop-and-create
+
+  #security with keycloak
+  # Go to Realm Settings in keycloak ui and click OpenID Endpoint Configuration to get different endpoint urls e.g. token_endpoint
+  oidc:
+    enabled : true
+    # if discovery-enabled default i.e. true gives issues or error RESTEASY003210 Could not find resource http://localhost:8990/auth/realms/demo-realm//.well-known/openid-configuration
+    discovery-enabled: false
+    auth-server-url: http://localhost:8990/auth/realms/demo-realm
+    client-id: userapi
+    # To get the secret for user-api client in Keycloak realm ,access the Credentials page of client configuration
+    credentials: 
+      secret: d6286cb9-863d-4492-abed-ed4f4e1fbf67
+    # set below path urls explicitly when discovery enabled is false, use the json returned by keycloak OpenID Endpoint Configuration Link on the realm page
+    authorization-path: http://localhost:8990/auth/realms/demo-realm/protocol/openid-connect/auth
+    token-path: http://localhost:8990/auth/realms/demo-realm/protocol/openid-connect/token
+    jwks-path: http://localhost:8990/auth/realms/demo-realm/protocol/openid-connect/certs
+    introspection-path: http://localhost:8990/auth/realms/demo-realm/protocol/openid-connect/token/introspect
+    user-info-path: http://localhost:8990/auth/realms/demo-realm/protocol/openid-connect/userinfo
+    end-session-path: http://localhost:8990/auth/realms/demo-realm/protocol/openid-connect/logout
+
+  
+  # swagger ui is included only in dev by default
+  swagger-ui: 
+    always-include: true        
+
+  # Logging configuration
+  log:
+    level: INFO
+    console:
+      enable: true
+      format: "%d{HH:mm:ss} %-5p traceId=%X{traceId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n"
+      # format: %d{{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] %L (%t) %s%e%n
+      level: INFO
+      color: false
+      # with quarkus.logging.json in POM 
+      json: true
+    file:
+      enable: true
+      path: ./qklog.txt
+    category:
+      "org.hibernate":
+        level: WARN
+      "io.quarkus":
+        level: INFO
+      "org.apache.kafka":
+        level: ERROR
+      "com.apimsa.labs":
+        level: DEBUG
+        
+  jaeger:
+    service-name: user-crud
+    sampler-type: const
+    sampler-param: 1
+    
+  jib.base-jvm-image: fabric8/java-alpine-openjdk11-jre
+  jib.base-registry-username: labamol
+  jib.base-registry-password: Apimsa@402
+  
+  container-image:
+    build: true
+    tag: 1.0
+    push: true
+    registry: registry.hub.docker.com
+    group: labamol
+    name: user-api
+    username: labamol
+    password: Apimsa@402
+
+
+# Refer https://quarkus.io/guides/kubernetes#configuration-options
+
+  kubernetes:
+    deployment-target: kubernetes
+    # deployment-target: openshift 
+    part-of: user-app
+    service-type: ClusterIP
+    # service-type: NodePort
+    image-pull-policy: always
+    service-account: default
+    replicas: 1
+    
+#  openshift:
+#    expose: true   
+
+# defined in a custom configuration bean class in config package    
+userapiconfig:
+   apiversion: v1.0
+   
+resteasy:
+  role:
+    based:
+      security: true  
+      
+keycloak:
+  policy-enforcer:
+    enable: true     
+    

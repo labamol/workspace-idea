@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: address-springapp-props
+data:
+  props.gitbranch: release       
+  props.env: stg              
+
+    

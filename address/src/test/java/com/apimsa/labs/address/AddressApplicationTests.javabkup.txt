@@ -1,0 +1,87 @@
+package com.apimsa.labs.address;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import static io.restassured.RestAssured.given;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.parsing.Parser;
+import io.restassured.response.Response;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import java.io.StringReader;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+
+import static org.hamcrest.Matchers.equalTo;
+
+
+
+//@RunWith(SpringRunner.class)  // for junit4 only
+@SpringBootTest
+public class AddressApplicationTests {
+
+	private Logger log = LoggerFactory.getLogger(AddressApplicationTests.class);
+	
+	@BeforeEach
+	public void setup() {
+		
+		//RestAssured.baseURI = "http://localhost" ;
+		//RestAssured.port = 9082;
+    	RestAssured.defaultParser = Parser.JSON;
+	}
+	
+	@Test
+    public void testAddressEndpoint() {
+
+    	log.info("Get");
+    	
+    	
+
+		// Test GET 
+		Response result = 
+				given()
+				.when().get("http://localhost:8080/address/101").then()
+				.assertThat() .statusCode(200) .contentType(ContentType.JSON) .extract()
+				.response();
+		  
+		System.out.println(result.asString());
+		String stateCode = result.jsonPath().getString("stateCode");
+		assertThat(stateCode, is(equalTo("MH")));
+		 		
+    	
+		  
+		JsonObject objUser; 
+		  
+		// Test POST Order 
+		  
+		objUser = Json.createObjectBuilder()
+				  // .add("id", new Long(200)) // commenting as @Id is Generated.AUTO
+				  .add("addressId", "105" )
+				  .add("personId", "202")
+				  .add("city", "Pune")
+				  .add("stateCode", "MH")
+				  .add("countryCode", "IN")
+				  .build();
+		  
+		  given()
+		  .contentType("application/json")
+		  .body(objUser.toString())
+		  .when()
+		  .post("http://localhost:8080/address")
+		  .then()
+		  .statusCode(201);
+		  
+	    }
+
+}

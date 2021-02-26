@@ -1,0 +1,95 @@
+# application.properties and yaml is always loaded, irrespective of the spring.profiles.active value. 
+# If there is the same key-value present both in application.properties and application-<environment>.properties, the latter will override the former.
+
+#server port to listen on
+server:
+  port=9082
+
+spring:
+  profiles:
+    active: dev
+
+#logging
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        data: debug
+
+#actuator
+info:
+  app:
+    name: Person
+    description: Manage Person
+    version: 1.0.0
+
+# To expose all enabled actuator endpoints except one (for example /loggers), we use below. 
+# For all endpoints check http://localhost:8080/actuator. Use a comma-separated list
+management:
+  endpoints:
+    web:
+      exposure
+        include: *
+        exclude: loggers
+    jmx:
+      exposure:
+        include: *
+        exclude: 
+    #actuator health endpoint 
+    health
+      show-details: always
+
+
+#Redis Standalone Config
+
+redis:
+  standalone: 
+    host: localhost
+    port: 6379
+	timeout: 3000
+
+
+# Redis Sentinel Config
+
+redis:
+  sentinel:
+    host: "127.0.0.1:5000;127.0.0.1:5001;127.0.0.1:5002"
+    timeout: 3000
+
+
+# Redis Cluster Config
+
+redis:
+  cluster:
+    host: "127.0.0.1:7000;127.0.0.1:7001;127.0.0.1:7002;127.0.0.1:7003;127.0.0.1:7004;127.0.0.1:7005"
+    timeout:3000
+
+
+# Redis Modes -> standalone,sentinel,cluster
+
+activeRedisMode: standalone
+
+#Annotation less configuration 
+#Dekorate looks for supported configuration as follows in increasing order of priority
+#meaning any configuration found in an application descriptor will override any existing 
+#annotation-specified configuration:
+
+#Annotations (Avoid as best practice)
+#application.properties
+#application.yaml
+#application.yml
+#application-kubernetes.properties
+#application-kubernetes.yaml
+#application-kubernetes.yml
+# -------------------
+
+dekorate:
+  kubernetes:
+    name: "address"
+    version: "1"
+    labels:
+      - key: "foo"
+        value: "bar"
+        
+        

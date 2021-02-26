@@ -1,0 +1,24 @@
+#Annotation less configuration 
+#Dekorate looks for supported configuration as follows in increasing order of priority
+#meaning any configuration found in an application descriptor will override any existing 
+#annotation-specified configuration:
+
+#Annotations (Avoid as best practice)
+#application.properties
+#application.yaml
+#application.yml
+#application-kubernetes.properties
+#application-kubernetes.yaml
+#application-kubernetes.yml
+# -------------------
+
+
+dekorate:
+  kubernetes:
+    name: "address"
+    version: "1"
+    labels:
+      - key: "foo"
+        value: "bar"
+        
+        

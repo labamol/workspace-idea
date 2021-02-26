@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.apimsa.labs</groupId>
+	<artifactId>address</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>address</name>
+	<description>address</description>
+
+	
+	<!-- <scm>
+        <url>https://github.com/labamol/apimsalab</url>
+        <connection>scm:git:git://github.com/labamol/apimsalab.git</connection>
+        <developerConnection>scm:git:git@github.com:labamol/apimsalab.git</developerConnection>
+    </scm> -->
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.16.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>11</java.version> <!-- 1.8 is minimum required version to support jib -->
+		<!-- add below else mvn throws IllegalStateException: Maven version check failed -->
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+   		<maven.compiler.target>${java.version}</maven.compiler.target>
+   		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<junit-jupiter.version>5.3.2</junit-jupiter.version>
+		<start-class>com.apimsa.labs.address.AddressApplication</start-class> 	
+		<jacoco.version>0.8.3</jacoco.version>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+		<sonar.language>java</sonar.language>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		
+		<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-mongodb</artifactId>
+			</dependency>
+
+		<!-- Dont add jpa when Spring Data Mongodb is included
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		
+		 -->
+
+		<dependency> 
+            <groupId>org.springframework.boot</groupId> 
+            <artifactId>spring-boot-starter-web</artifactId> 
+        </dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jersey</artifactId>
+		</dependency>
+		
+		 <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+	        
+        <!--  Dev Tools and HAL Browser  -->	
+        	
+	     <dependency>
+	            <groupId>org.springframework.boot</groupId>
+	            <artifactId>spring-boot-devtools</artifactId>
+	            <optional>true</optional>
+	    </dependency>
+        
+        <dependency>
+			 <groupId>org.springframework.data</groupId>
+			 <artifactId>spring-data-rest-hal-browser</artifactId>
+		 </dependency>
+		 
+		 <!-- End : Dev Tools and HAL Browser  -->
+        
+        <!-- With JDK 11 and io.dekorate use correct version of this artifact id to avoid this error
+        java.lang.IllegalStateException: Maven version check failed!
+   		at io.dekorate.utils.Maven.getVersion (Maven.java:55)
+    	at io.dekorate.project.MavenInfoReader.getInfo (MavenInfoReader.java:73) -->
+        
+        <!-- Using Dekorate.io to generate K8s artifact/resource yaml manifests from Java annotations and/or application.properties -->
+		<!-- With mvn clean package, The generated manifests can be found under target/classes/META-INF/dekorate -->
+        
+<!--         adds kubernetes-annotations as transitive dependency -->
+        <dependency>
+		  <groupId>io.dekorate</groupId>
+		  <artifactId>kubernetes-spring-starter</artifactId>
+		  <version>1.0.1</version>
+		</dependency>
+		
+		<!-- If you are on OpenShift: -->
+		<!-- <dependency>
+			<groupId>io.dekorate</groupId>
+			<artifactId>openshift-spring-starter</artifactId>
+			<version>1.0.1</version>
+		</dependency> -->
+        
+        
+	       	  
+	    <!-- For swagger 2.0 generation  on url /v2/api-docs-->   	
+	    
+		    <dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>2.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>2.4.0</version>
+			</dependency>  
+				       	  
+	    <!-- End: For swagger 2.0 generation  -->
+	    
+	    
+	    <!-- For OpenAPI 3 specification docs UI-->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-data-rest</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+	    
+	    <!-- End: For OpenAPI 3 specification docs UI-->
+	    
+	   <!--  Optional if using separate model entities and dto classes
+	    <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>2.3.7</version>
+        </dependency> -->
+        
+        <!--  For CollectionUtils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+        </dependency>
+	    
+	     <!--  End: For CollectionUtils -->
+	    
+	    
+	    <!--  add git details . gives build info in actuator endpoint http://localhost:8080/actuator/info -->
+	    <dependency>
+		    <groupId>pl.project13.maven</groupId>
+		    <artifactId>git-commit-id-plugin</artifactId>
+		    <version>2.2.6</version>
+		</dependency>  
+		
+		<!-- use spring security to secure actuator endpoints -->
+		<!--
+		<dependency>
+		   <groupId>org.springframework.boot</groupId>
+		   <artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		
+		<dependency>
+		   <groupId>org.springframework.security.oauth</groupId>
+		   <artifactId>spring-security-oauth2</artifactId>
+		</dependency>
+		-->
+		
+		<!-- Micrometer Prometheus registry  used by sprint to send actuator metrics to prometheus . check http://localhost:8080/actuator/prometheus -->
+		
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+	    
+	    <!-- for distributed tracing -->   
+	    <dependency>
+		    <groupId>io.opentracing.contrib</groupId>
+		    <artifactId>opentracing-spring-web-autoconfigure</artifactId>
+		    <version>0.3.2</version>
+		</dependency>
+	    
+	    <!--  jaeger for tracer bean -->
+	    <dependency>
+		  <groupId>io.jaegertracing</groupId>
+		  <artifactId>jaeger-client</artifactId>
+		  <version>0.34.0</version>
+		</dependency>	    
+		
+		<!--  REST Assured for testing REST API Controller endpoints -->
+	    <dependency>
+		  <groupId>io.rest-assured</groupId>
+		  <artifactId>rest-assured</artifactId>
+<!-- 		  <version>4.3.0</version> -->
+		</dependency>			
+		<dependency>
+		  <groupId>io.rest-assured</groupId>
+		  <artifactId>json-schema-validator</artifactId>
+<!-- 		  <version>4.3.0</version> -->
+		</dependency>	
+		<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+<!--             <version>2.11.0</version> -->
+        </dependency>   
+        		<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+<!--             <version>2.11.0</version> -->
+        </dependency>  
+        		<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+<!--             <version>2.11.0</version> -->
+        </dependency>   
+		<!-- https://mvnrepository.com/artifact/javax.json/javax.json-api -->
+		<dependency>
+		    <groupId>javax.json</groupId>
+		    <artifactId>javax.json-api</artifactId>
+<!-- 		    <version>1.1.4</version> -->
+		</dependency>
+		
+		<!-- Problem spring web library for testing -->
+		<dependency>
+		    <groupId>org.zalando</groupId>
+		    <artifactId>problem-spring-web</artifactId>
+		    <version>0.23.0</version>
+		</dependency>
+		
+		
+		<!-- Keep test dependency last -->
+      <!--   Spring Boot Test Starter brings in a wide range of dependencies for Unit Testing
+
+			Basic Test Framework - JUnit
+			Mocking - Mockito
+			Assertion - AssertJ, Hamcrest
+			Spring Unit Test Framework - Spring Test -->
+        
+        <dependency>
+			    <groupId>org.springframework.boot</groupId>
+			    <artifactId>spring-boot-starter-test</artifactId>
+			    <scope>test</scope>
+			    <exclusions>
+	                <exclusion>
+	                    <groupId>junit</groupId>
+	                    <artifactId>junit</artifactId>
+	                </exclusion>
+	            </exclusions> 
+			</dependency>       
+			
+			<!-- junit 5 -->
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-api</artifactId>
+				<version>5.3.2</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>5.3.2</version>
+				<scope>test</scope>
+			</dependency>
+	        
+	        
+        <!-- End: Keep test dependency last -->
+	</dependencies>
+
+	<!-- Jib allows not only to generate the Docker image, but also to push it in a remote registry, and send it to the Docker daemon. The plugin provides two goals for that, build to push and dockerBuild to send to the daemon. Because usage can be cumbersome 
+	e.g. mvn package com.google.cloud.tools:jib-maven-plugin:dockerBuild, Either create Maven profiles with plugin for jib or include under build plugins as done below-->
+
+	<build>
+		<plugins>
+			<!-- Remove the below spring-boot-maven-plugin if you are using Spring Boot. 
+			There is no need to create a fat jar anymore 
+			-->
+			<!-- <plugin> 
+		      <groupId>org.springframework.boot</groupId> 
+		      <artifactId>spring-boot-maven-plugin</artifactId> 
+		      <executions> 
+		        <execution> 
+		          <goals> 
+		          		<goal>build-info</goal>
+						<goal>repackage</goal>
+		          </goals> 
+		        </execution> 
+		      </executions> 
+		      <configuration> 
+		        <mainClass>${start-class}</mainClass> 
+		      </configuration> 
+	    	</plugin> -->
+	    	
+	    	<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+<!--                 <version>2.22.2</version> -->
+			   <configuration>
+			    <argLine>@{jaCoCoArgLine} --illegal-access=permit</argLine>
+			   </configuration>
+			   <dependencies>
+			    <!-- update compiler plugin dependency on ASM for Java 11 compatibility -->
+			        <dependency>
+			            <groupId>org.ow2.asm</groupId>
+			            <artifactId>asm</artifactId>
+			            <version>6.2</version>
+			        </dependency>
+			    </dependencies>
+            </plugin>
+            
+            <plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-failsafe-plugin</artifactId>
+			    <configuration>
+			    <argLine>
+			    --illegal-access=permit
+			    </argLine>
+			  </configuration>
+			</plugin>
+			
+<!-- 			<plugin> 
+	          <groupId>org.apache.maven.plugins</groupId> 
+	          <artifactId>maven-compiler-plugin</artifactId> 
+	        <version>3.8.1</version> 
+	        <configuration> 
+	          <source>${java.version}</source> 1.8 for java8 and 9,10 or 11 for higher versions
+	          <target>${java.version}</target> 
+	          <release>${java.version}</release>
+	        </configuration> 
+	        <dependencies>
+	         update compiler plugin dependency on ASM for Java 11 compatibility
+		        <dependency>
+		            <groupId>org.ow2.asm</groupId>
+		            <artifactId>asm</artifactId>
+		            <version>6.2</version>
+		        </dependency>
+		    </dependencies>
+	        </plugin> -->
+			
+			<plugin>	
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<dateFormat>yyyyMMdd-HHmmss</dateFormat><!--  human-readable part of the version number -->
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<failOnNoGitDirectory>false</failOnNoGitDirectory>
+					<excludeProperties>git.build.user.*,git.commit.user.*,git.remote.*,git.closest.*</excludeProperties>
+					<includeOnlyProperties>    
+						<includeOnlyProperty>git.commit.id</includeOnlyProperty>
+					</includeOnlyProperties>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+				</configuration>
+			</plugin> 
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>			
+				<artifactId>maven-scm-plugin</artifactId>			
+				<version>1.9.5</version>
+				<configuration>
+					<tag>v${project.version}</tag>
+				</configuration>
+			</plugin>
+								
+			<plugin>
+					<groupId>com.google.cloud.tools</groupId>
+					<artifactId>jib-maven-plugin</artifactId>
+					<version>2.5.2</version>
+					<executions>
+						<!--  builds to docker daemon which must be running 
+								mvn package com.google.cloud.tools:jib-maven-plugin:dockerBuild
+								
+						<execution>
+							<id>docker-daemon</id>
+							<phase>package</phase>
+							<goals>
+								<goal>dockerBuild</goal>
+							</goals>
+						</execution> 
+						
+						-->
+						<execution>
+				            <id>build-and-push-docker-image</id>
+				            <phase>package</phase>
+				            <goals>
+				                <!--  `jib:build` is daemonless and won't create the image on your machine.
+								# It talks directly to the registry. Use `docker pull` to fetch the created image. 
+								mvn package com.google.cloud.tools:jib-maven-plugin:build -->
+				                <goal>build</goal>
+				            </goals>
+				        </execution>
+					</executions>
+					<configuration>
+					<!-- specify the docker credentials in mavn settings xml under servers -->
+				      <from>
+						<!-- 	pull from docker hub -->
+						<image>openjdk:11.0.5-jre-slim</image>
+						<!--  avoid using auth okay for dev purposes only, switch to credHelper or Maven settings -->
+						<auth>
+					      <username>labamol</username>
+					      <password>Apimsa@402</password>
+					    </auth>
+				      </from>
+					  <to>
+				         <!-- 	push to docker hub -->
+				         <!-- <image>docker.io/labamol/apimsalab/${project.artifactId}:${project.version}</image> -->
+				         
+				         <!--  push to docker private registry -->
+				         <image>devops-registry.local:5000/${project.artifactId}:${project.version}</image>
+				         <auth>
+					      <username>devops</username>
+					      <password>devops</password>
+					     </auth>
+				         
+				          <!--  push to Nexus private registry i.e. docker hosted repo named apimsa at port 5001 -->
+				        <!--  <image>127.0.0.1:5001/${project.artifactId}:${project.version}</image>
+				         <auth>
+					      <username>admin</username>
+					      <password>admin123</password>
+					    </auth>
+				          -->
+				         <!--  avoid using auth okay for dev purposes only, switch to credHelper or Maven settings -->
+						<!-- <auth>
+					      <username>labamol</username>
+					      <password>Apimsa@402</password>
+					    </auth> -->
+				         <!-- optional: create a tag based on the git commit id (via the git-commit-id plugin): -->
+           			 	 <tags>
+<!--                 			<tag>${git.commit.id}</tag> -->
+							<tag>latest</tag>
+						 </tags>
+				      </to>
+				      <allowInsecureRegistries>true</allowInsecureRegistries>
+				      <container>
+				        <jvmFlags>
+							<jvmFlag>-Xms512m</jvmFlag>
+							<jvmFlag>-Xdebug</jvmFlag>
+						</jvmFlags>
+				        <ports>
+				            <port>8082</port>
+							<!--  <port>8083-8084/udp</port> -->				            
+				        </ports>
+				        <labels>
+				        	<name>addressapi-bootjib</name>
+				        </labels>
+				        <!-- Tried to push image manifest for 127.0.0.1:5000/address:0.0.1-SNAPSHOT but failed because: Registry may not support pushing OCI Manifest or Docker Image Manifest Version 2, Schema 2   -->
+						<!-- <format>OCI</format> -->
+				      </container>
+				   </configuration>
+				</plugin>
+				
+				
+				<!-- execute jacoco goals prepare-agent then maven install phase and then jacoco report goal  -->
+				<plugin>
+				    <groupId>org.jacoco</groupId>
+				    <artifactId>jacoco-maven-plugin</artifactId>
+				    <version>${jacoco.version}</version>
+				    <!-- skip configuration as most is default anyways -->
+ 				    <configuration>
+ 				    	<!-- add below propertyName and refer to this in the maven surefire plugin configuration 
+				    	else you will get message - Skipping JaCoCo execution due to missing execution data file -during build
+				    	-->
+ 				  		<propertyName>jaCoCoArgLine</propertyName>
+				        <skip>${maven.test.skip}</skip>
+				        <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+				        <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+				        <output>file</output>
+				        <append>true</append>
+				        <excludes>
+				            <exclude>*MethodAccess</exclude>
+				        </excludes>
+				    </configuration> 
+				    
+				    <executions>
+				        <execution>
+				            <id>jacoco-initialize</id>
+				            <goals>
+				                <goal>prepare-agent</goal>
+				            </goals>
+<!-- 				            <phase>test-compile</phase> -->
+				        </execution>
+				        <execution>
+				            <id>jacoco-site</id>
+				            <phase>package</phase>
+				            <goals>
+				                <goal>report</goal>
+				            </goals>
+				        </execution>
+				    </executions>
+				</plugin>
+		</plugins>
+	</build>
+
+</project>

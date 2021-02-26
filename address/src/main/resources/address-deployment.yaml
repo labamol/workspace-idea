@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: address-springapp
+  labels:
+    app: address-springapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: address-springapp
+  template:
+    metadata:
+      labels:
+        app: address-springapp
+    spec:
+      volumes:
+      - name: config
+        emptyDir: {}
+      initContainers:
+      - name: git-clone
+        image: alpine/git:1.0.4
+        command: ['/bin/sh', '-c']
+        args: ['git clone --branch $(props.branch) https://github.com/labamol/apimsalab.git && mv address-springapp-props/$(props.env)/* /config']
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        envFrom:
+          - configMapRef:
+              name: address-springapp-props
+      containers:
+      - name: address-springapp
+        image: XXXXXXXXXXXXXX:latest 
+        volumeMounts:
+        - name: config
+            mountPath: /config
+    readOnly: true
+        ports:
+        - containerPort: 8080
